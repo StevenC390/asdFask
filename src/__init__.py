@@ -1,8 +1,7 @@
 from flask import Flask
 from os import environ
-from src.database import db, ma
-from src.endpoints.users import users
-from src.endpoints.products import products
+from src.database import db, ma, migrate
+from src.endpoints import products, users, houses
 
 def create_app():
     app = Flask(__name__,
@@ -24,10 +23,12 @@ def create_app():
     
     ##Load the blueprints (endpoints)
     app.register_blueprint(products)
+    app.register_blueprint(users)
+    app.register_blueprint(houses)
     
     db.init_app(app)
-    
     ma.init_app(app)
+    migrate.init_app(app, db)
     
     ## Create the database tables
     with app.app_context():

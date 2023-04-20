@@ -13,9 +13,8 @@ product_data = [
 ]
 
 
-@products.get("/")
 def read_all():
-    return {"data": product_data}, 200
+    return {"data": product_data}, HTTPStatus.OK
 
 
 
@@ -23,43 +22,37 @@ def read_all():
 def read_one(id):
     for product in product_data:
         if product['id'] == id:
-            return {"data": product}, 200
-    
-    return {"error": "Resource not found"}, 404
+            return {"data": product}, HTTPStatus.OK
+    return {"error": "Resource not found"}, HTTPStatus.NOT_FOUND
 
 
 @products.post("/")
 def create():
     post_data = request.get_json()
-    
     product = {
-        "id": len(product_data) + 1,
-        "name": post_data.get('name', 'No Name'),
-        "price": post_data.get('price', 0),
-        "expiration": post_data.get('expiration', None)
+    "id": len(product_data) + 1,
+    "name": post_data.get('name', 'No Name'),
+    "price": post_data.get('price', 0),
+    "expiration": post_data.get('expiration', None)
     }
-    
     product_data.append(product)
-    
-    return {"data": product}, 201
+    return {"data": product}, HTTPStatus.CREATED
 
 
 @products.put('/<int:id>')
 @products.patch('/<int:id>')
 def update(id):
     post_data = request.get_json()
-    
     for i in range(len(product_data)):
         if product_data[i]['id'] == id:
             product_data[i] = {
-                "id": id,
-                "name": post_data.get('name'),
-                "price": post_data.get('price'),
-                "expiration": post_data.get('expiration')
-            }   
-        return {"data": product_data[i]}, 200
-    
-    return {"error": "Resource not found"}, 404
+            "id": id,
+            "name": post_data.get('name'),
+            "price": post_data.get('price'),
+            "expiration": post_data.get('expiration')
+            }
+        return {"data": product_data[i]}, HTTPStatus.OK
+    return {"error": "Resource not found"}, HTTPStatus.NOT_FOUND
 
 
 @products.delete("/<int:id>")
@@ -67,9 +60,8 @@ def delete(id):
     for i in range(len(product_data)):
         if product_data[i]['id'] == id:
             del product_data[i]
-            return {"data": ""}, 204
-        
-    return {"error": "Resource not found"}, 404
+            return {"data": ""}, HTTPStatus.NO_CONTENT
+    return {"error": "Resource not found"}, HTTPStatus.NOT_FOUND
 
 
 @products.get("/<int:id>/providers")
